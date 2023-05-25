@@ -1,8 +1,8 @@
 from torchtext.data import Example, Dataset, Field
 from nltk.tokenize import word_tokenize
+from seq2seq.models.__init__ import EOS_TOKEN, SOS_TOKEN
 
 class HandleDataset(object):
-    """VerbalDataset class"""
 
     def __init__(self, train, val, test):
         self.train = train
@@ -32,7 +32,7 @@ class HandleDataset(object):
             answer = sample["answers"]
             question = sample["questions"]
 
-            src = f"<s>{context}</s></s>{answer}</s>"
+            src = f"{context} {answer}"
             trg = question
 
             train_examples.append((src, trg))
@@ -44,7 +44,7 @@ class HandleDataset(object):
             answer = sample["answers"]
             question = sample["questions"]
 
-            src = f"<s>{context}</s></s>{answer}</s>"
+            src = f"{context} {answer}"
             trg = question
 
             test_examples.append((src, trg))
@@ -56,21 +56,21 @@ class HandleDataset(object):
             answer = sample["answers"]
             question = sample["questions"]
 
-            src = f"<s>{context}</s></s>{answer}</s>"
+            src = f"{context} {answer}"
             trg = question
 
             val_examples.append((src, trg))
 
         # Create fields
         self.src_field = Field(tokenize=word_tokenize,
-                               init_token="<s>",
-                               eos_token="</s>",
+                               init_token=SOS_TOKEN,
+                               eos_token=EOS_TOKEN,
                                lower=True,
                                include_lengths=True,
                                batch_first=True)
         self.trg_field = Field(tokenize=word_tokenize,
-                               init_token="<s>",
-                               eos_token="</s>",
+                               init_token=SOS_TOKEN,
+                               eos_token=EOS_TOKEN,
                                lower=True,
                                batch_first=True)
 

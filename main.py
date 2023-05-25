@@ -5,7 +5,7 @@ import torch
 
 """Constants for the baseline models"""
 SEED = 42
-QUESTION = 'question'
+QUESTION = 'context+answer'
 
 RNN_NAME = 'rnn'
 CNN_NAME = 'cnn'
@@ -20,17 +20,18 @@ TRG_NAME = 'trg'
 path = '/kaggle/working/'
 def parse_args():
     """Add arguments to parser_data"""
-    parser = argparse.ArgumentParser(description='Verbalization dataset baseline models.')
+    parser = argparse.ArgumentParser(description='Baseline models.')
     parser.add_argument('--model', default=RNN_NAME, type=str,
                         choices=[RNN_NAME, CNN_NAME, TRANSFORMER_NAME], help='model to train the dataset')
+    parser.add_argument('--dataset', type = str,
+                        choices=['ViNewsQA','ViQuAD','ViMMRC1.0','ViMMRC2.0','ViCoQA','ViCoV19QA'],
+                        help = 'the dataset used for training model')
     parser.add_argument('--input', default=QUESTION, type=str,
                         choices=[QUESTION], help='use question as input')
     parser.add_argument('--attention', default=ATTENTION_2, type=str,
                         choices=[ATTENTION_1, ATTENTION_2], help='attention layer for rnn model')
     parser.add_argument('--batch_size', default=8, type=int, help='batch size')
     parser.add_argument('--epochs_num', default=30, type=int, help='number of epochs')
-    parser.add_argument('--answer_num', default=1, type=int,
-                        choices=[1,2,3,4], help='number of answer')
     args = parser.parse_args()
     return args
 

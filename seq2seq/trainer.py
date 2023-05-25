@@ -1,11 +1,8 @@
-import math
-from torch.utils.data import DataLoader
 import numpy as np
 import torch
 import tqdm
 from main import RNN_NAME, Checkpoint
 import time
-from torch.utils.data import DataLoader, RandomSampler
 from torchtext.data import BucketIterator
 
 class Evaluator(object):
