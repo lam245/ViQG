@@ -100,7 +100,7 @@ else:
     optimizer = optim.Adam(model.parameters(),lr=0.001)
 
 batch_size = 8
-epochs=1
+epochs=10
 
 # define criterion
 criterion = nn.CrossEntropyLoss(ignore_index=trg_vocab.stoi[PAD_TOKEN])
