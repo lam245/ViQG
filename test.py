@@ -1,5 +1,4 @@
 import math
-
 import numpy as np
 import pandas as pd
 from torchtext.data import BucketIterator
@@ -11,7 +10,6 @@ from seq2seq.metrics import BleuScorer
 from seq2seq.models import PAD_TOKEN
 from seq2seq.models.seq2seq import Seq2Seq
 import nltk
-
 from seq2seq.prediction import Predictor
 from seq2seq.trainer import Trainer
 import torch
@@ -110,7 +108,6 @@ train_loss, val_loss = trainer.train(model, train_data, valid_data, 'datasets', 
 
 val_ref = [list(filter(None, np.delete([sample["contexts"], sample["answers"], sample["questions"]],[0,1]))) for sample in val]
 
-
 test_ref = [list(filter(None, np.delete([sample["contexts"], sample["answers"], sample["questions"]],[0,1]))) for sample in test]
 
 val_trg = []
@@ -125,11 +122,9 @@ for t in trg_:
         t.append(tmp)
 
 val_src = [i.src for i in valid_data.examples]
-new_valid = [[val_src[i], val[i]["questions"]] for i in range(len(val))]
+new_valid = [[val_src[i], [word_tokenize(val[i]["questions"])]] for i in range(len(val))]
 test_src = [i.src for i in test_data.examples]
-new_test = [[test_src[i], test[i]["questions"]] for i in range(len(test))]
-
-
+new_test = [[test_src[i], [word_tokenize(test[i]["questions"])]] for i in range(len(test))]
 
 name = args.model+"_"+cell_name if args.model==RNN_NAME else args.model
 #model = Checkpoint.load(model,path,'./{}.pt'.format(name))
@@ -156,20 +151,21 @@ valid_scorer.data_score(new_valid, predictor)
 test_scorer.data_score(new_test, predictor)
 
 print(f'| Val. Loss: {valid_loss:.3f} | Test PPL: {math.exp(valid_loss):7.3f} |')
-print(f'| Val. Data Average BLEU1, BLEU4 score {valid_scorer.average_score()} |')
-print(f'| Val. Data Average METEOR score {valid_scorer.average_meteor_score()} |')
+print(f'| Val. Data Average BLEU1,BLEU2, BLEU3, BLEU4 score {valid_scorer.average_score()} |')
 print(f'| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |')
-print(f'| Test Data Average BLEU1, BLEU4 score {test_scorer.average_score()} |')
-print(f'| Test Data Average METEOR score {test_scorer.average_meteor_score()} |')
+print(f'| Test Data Average BLEU1,BLEU2, BLEU3, BLEU4 score {test_scorer.average_score()} |')
 
 r = {'ppl':[round(math.exp(test_loss),3)],
      'BLEU-1':[test_scorer.average_score()[0]*100],
+     'BLEU-2':[test_scorer.average_score()[1]*100],
+     'BLEU-3':[test_scorer.average_score()[2]*100],
      'BLEU-4':[test_scorer.average_score()[1]*100],
-     'METEOR':[test_scorer.average_meteor_score()*100],
      'ROUGE-L':[test_scorer.average_rouge_score()*100]}
 
 df_result = pd.DataFrame(data=r)
 
-print(df_result)
+df_result.to_csv('statistic.csv')
 
 html = df_result.style.set_table_styles([{'selector': 'th', 'props': [('font-size', '15pt')]}]).set_properties(**{'font-size': '15pt'})
+
+print(html.__dict__)
