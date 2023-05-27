@@ -6,7 +6,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from seq2seq.models.__init__ import PAD_TOKEN
+from seq2seq.models.conf import PAD_TOKEN
 from seq2seq.models.layers import Embedding, Linear, Conv1d, PositionalEmbedding, LearnedPositionalEmbedding
 
 def extend_conv_spec(convolutions):

@@ -1,6 +1,6 @@
 from torchtext.data import Example, Dataset, Field
 from underthesea import word_tokenize
-from seq2seq.models.__init__ import EOS_TOKEN, SOS_TOKEN
+from seq2seq.models.conf import EOS_TOKEN, SOS_TOKEN
 
 class HandleDataset(object):
 

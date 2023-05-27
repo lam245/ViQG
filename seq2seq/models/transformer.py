@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.onnx.operators
 import torch.nn.functional as F
 from torch.autograd import Variable
-from seq2seq.models.__init__ import PAD_TOKEN
+from seq2seq.models.conf import PAD_TOKEN
 
 
 class Encoder(nn.Module):

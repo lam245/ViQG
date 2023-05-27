@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import tqdm
-from main import RNN_NAME, Checkpoint
+from main import Checkpoint
 import time
 from torchtext.data import BucketIterator
 
@@ -17,9 +17,9 @@ class Evaluator(object):
             for _, batch in enumerate(iterator):
                 src, src_len = batch.src
                 trg = batch.trg
-                input_trg = trg if model.name == RNN_NAME else trg[:, :-1]
+                input_trg = trg if model.name == 'rnn' else trg[:, :-1]
                 output = model(src, src_len, input_trg, teacher_ratio)
-                trg = trg.t() if model.name == RNN_NAME else trg[:, 1:]
+                trg = trg.t() if model.name == 'rnn' else trg[:, 1:]
                 output = output.contiguous().view(-1, output.shape[-1])
                 trg = trg.contiguous().view(-1)
                 # output: (batch_size * trg_len) x output_dim
@@ -47,9 +47,9 @@ class Trainer(object):
             src, src_len = batch.src
             trg = batch.trg
             self.optimizer.zero_grad()
-            input_trg = trg if model.name == RNN_NAME else trg[:, :-1]
+            input_trg = trg if model.name == 'rnn' else trg[:, :-1]
             output = model(src, src_len, input_trg, teacher_ratio)
-            trg = trg.t() if model.name == RNN_NAME else trg[:, 1:]
+            trg = trg.t() if model.name == 'rnn' else trg[:, 1:]
             output = output.contiguous().view(-1, output.shape[-1])
             trg = trg.contiguous().view(-1)
             # output: (batch_size * trg_len) x output_dim
@@ -66,7 +66,7 @@ class Trainer(object):
     def _get_iterators(self, train_data, valid_data, model_name):
         return BucketIterator.splits((train_data, valid_data),
                                      batch_size=self.batch_size,
-                                     sort_within_batch=True if model_name == RNN_NAME else \
+                                     sort_within_batch=True if model_name == 'rnn' else \
                                          False,
                                      sort_key=lambda x: len(x.src),
                                      device=self.device)

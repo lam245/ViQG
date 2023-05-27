@@ -7,7 +7,7 @@ import tqdm
 
 smoothie = SmoothingFunction().method4
 
-class BleuScorer(object):
+class ComputeScorer(object):
     """Blue scorer class"""
 
     def __init__(self):
@@ -132,3 +132,5 @@ class BleuScorer(object):
         self.instances = 0
         self.predictions = []
         self.references = []
+        self.rouge_1 = 0
+        self.rouge_2 = 0

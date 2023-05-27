@@ -2,34 +2,16 @@ import argparse
 import random
 import numpy as np
 import torch
-
-"""Constants for the baseline models"""
-SEED = 42
-QUESTION = 'context+answer'
-
-RNN_NAME = 'rnn'
-CNN_NAME = 'cnn'
-TRANSFORMER_NAME = 'transformer'
-
-ATTENTION_1 = 'bahdanau'
-ATTENTION_2 = 'luong'
-
-SRC_NAME = 'src'
-TRG_NAME = 'trg'
-
-path = '/kaggle/working/'
 def parse_args():
     """Add arguments to parser_data"""
     parser = argparse.ArgumentParser(description='Baseline models.')
-    parser.add_argument('--model', default=RNN_NAME, type=str,
-                        choices=[RNN_NAME, CNN_NAME, TRANSFORMER_NAME], help='model to train the dataset')
+    parser.add_argument('--model_name', default='rnn', type=str,
+                        choices=['rnn','cnn','transformer'], help='model to train the dataset')
     parser.add_argument('--dataset', type = str,
-                        choices=['ViNewsQA','ViQuAD','ViMMRC1.0','ViMMRC2.0','ViCoQA','ViCoV19QA'],
+                        choices=['ViNewsQA','ViQuAD','ViCoQA','ViMMRC1.0','ViMMRC2.0'],
                         help = 'the dataset used for training model')
-    parser.add_argument('--input', default=QUESTION, type=str,
-                        choices=[QUESTION], help='use question as input')
-    parser.add_argument('--attention', default=ATTENTION_2, type=str,
-                        choices=[ATTENTION_1, ATTENTION_2], help='attention layer for rnn model')
+    parser.add_argument('--attention', default='luong', type=str,
+                        choices=['bahdanau','luong'], help='attention layer for rnn model')
     parser.add_argument('--batch_size', default=8, type=int, help='batch size')
     parser.add_argument('--epochs_num', default=30, type=int, help='number of epochs')
     args = parser.parse_args()
@@ -51,7 +33,7 @@ class Checkpoint(object):
     @staticmethod
     def save(model,cell, path):
         """Save model using name"""
-        name_tmp = model.name+"_"+ cell if model.name==RNN_NAME else model.name
+        name_tmp = model.name+"_"+ cell if model.name=='rnn' else model.name
         name = f'{name_tmp}.pt'
         torch.save(model.state_dict(), path+name)
 

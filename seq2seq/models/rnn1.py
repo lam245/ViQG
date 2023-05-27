@@ -6,7 +6,7 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from seq2seq.models.__init__ import PAD_TOKEN, EOS_TOKEN, SOS_TOKEN
+from seq2seq.models.conf import PAD_TOKEN, EOS_TOKEN, SOS_TOKEN
 from seq2seq.models.layers import RNN, Embedding, Linear, LSTM, GRU
 
 class Encoder(nn.Module):
