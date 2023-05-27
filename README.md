@@ -23,7 +23,7 @@ The available datasets for this source code include: [ViNewsQA](https://arxiv.or
 ## Usage
 ### Install
 ```
-git clone 
+git clone https://github.com/Shaun-le/ViQG.git
 cd ViQG
 ```
 ### Prerequisite
@@ -31,6 +31,8 @@ To install dependencies, run:
 ```
 pip install -r requirements.txt
 ```
+### CLI
+
 ## Citation
 
     Comming soon!
