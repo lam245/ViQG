@@ -1,21 +1,25 @@
 import nltk
 import numpy as np
+from datasets import load_metric
 from nltk.translate.bleu_score import SmoothingFunction
 from rouge_score import rouge_scorer
 import tqdm
-smoothie = SmoothingFunction().method4
 
+smoothie = SmoothingFunction().method4
 
 class BleuScorer(object):
     """Blue scorer class"""
 
     def __init__(self):
         self.results = []
-
+        self.predictions = []
+        self.references = []
         self.score = 0
         self.bleu_2 = 0
         self.bleu_3 = 0
         self.bleu_4 = 0
+        self.rouge_1 = 0
+        self.rouge_2 = 0
         self.rouge_score = 0
 
         self.instances = 0
@@ -36,8 +40,15 @@ class BleuScorer(object):
         scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=False)
         scores = []
         for i in reference:
-            scores.append(scorer.score(i, hypothesis)['rougeL'][-1])
-        return np.max(scores)  # best
+            scores.append(scorer.score(i,hypothesis)['rougeL'][-1])
+        return np.max(scores) #best
+
+    '''def example_score_rouge_n(self,reference, hypothesis):
+        rouge = Rouge()
+        r = []
+        for i in reference:
+            r.append(rouge.get_scores(hypothesis, i)[0]['rouge-1']['f'])
+        return np.max(r)'''
 
     def data_score(self, data, predictor):
         """Score complete list of data"""
@@ -54,7 +65,8 @@ class BleuScorer(object):
             hypothesis = predictor.predict(src)
             bleu_1, bleu_2, bleu_3, bleu_4 = self.example_score(reference, hypothesis)
             rouge_score = self.example_score_rouge([' '.join(i) for i in reference], ' '.join(hypothesis))
-
+            self.references.append([' '.join(i) for i in reference])
+            self.predictions.append(' '.join(hypothesis))
             f = open("result.txt", "a", encoding = 'utf-8')
             f.write('Question: ' + " ".join(src) + '\n')
             for i in range(len(reference)):
@@ -65,7 +77,6 @@ class BleuScorer(object):
             f.write('BLEU-3: ' + str(bleu_3 * 100) + '\n')
             f.write('BLEU-4: ' + str(bleu_4 * 100) + '\n')
             f.write('ROUGE-L: ' + str(rouge_score * 100) + '\n\n')
-
             f.close()
 
             results_prelim.append({
@@ -105,8 +116,19 @@ class BleuScorer(object):
         """Return rouge average score"""
         return self.rouge_score / self.instances
 
+    def average_rouge_score_n(self):
+        metrics = load_metric('rouge')
+        metrics.add_batch(predictions=self.predictions, references=self.references)
+        metrics.compute()
+        results = [{k: v.mid.fmeasure} for k,v in metrics.compute(predictions=self.predictions, references=self.references).items()]
+        self.rouge_1 = results[0]['rouge1']*100
+        self.rouge_2 = results[1]['rouge2'] * 100
+        return self.rouge_1, self.rouge_2
+
     def reset(self):
         """Reset object properties"""
         self.results = []
         self.score = 0
         self.instances = 0
+        self.predictions = []
+        self.references = []

@@ -159,7 +159,9 @@ r = {'ppl':[round(math.exp(test_loss),3)],
      'BLEU-1':[test_scorer.average_score()[0]*100],
      'BLEU-2':[test_scorer.average_score()[1]*100],
      'BLEU-3':[test_scorer.average_score()[2]*100],
-     'BLEU-4':[test_scorer.average_score()[1]*100],
+     'BLEU-4':[test_scorer.average_score()[3]*100],
+     'ROUGE-1':[test_scorer.average_rouge_score_n()[0]],
+     'ROUGE-2':[test_scorer.average_rouge_score_n()[1]],
      'ROUGE-L':[test_scorer.average_rouge_score()*100]}
 
 df_result = pd.DataFrame(data=r)
