@@ -56,6 +56,7 @@ Comming soon!
 ***Note**
 
 [*]: name of dataset
+
 If you want to customize the batch size and number of epochs, you can do the following:
 ```
 python cli.py evaluate --model_name 'rnn' --dataset [*] --attention 'bahdanau' --batch_size 16 --epochs_num 10
