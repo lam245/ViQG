@@ -50,8 +50,8 @@ TRANSFORMER_NAME = 'transformer'
 ATTENTION_1 = 'bahdanau'
 ATTENTION_2 = 'luong'
 # Choose model here
-args.model = CNN_NAME # CNN and Transformers don't apply Attention_1, Attention_2
-args.attention = ATTENTION_1
+args.model = TRANSFORMER_NAME # CNN and Transformers don't apply Attention_1, Attention_2
+args.attention = ATTENTION_2
 cell_name = 'gru'
 
 if args.model == RNN_NAME and args.attention == ATTENTION_1:
@@ -168,6 +168,8 @@ df_result = pd.DataFrame(data=r)
 
 df_result.to_csv('statistic.csv')
 
+print(df_result)
+
 html = df_result.style.set_table_styles([{'selector': 'th', 'props': [('font-size', '15pt')]}]).set_properties(**{'font-size': '15pt'})
-print(html)
-print(html.__dict__)
+
+html
