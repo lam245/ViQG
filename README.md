@@ -37,15 +37,15 @@ To proceed with model training, please run the following code snippets:
 ```
 python cli.py evaluate --model_name 'rnn' --dataset [*] --attention 'bahdanau'
 ```
-- RNN-2 [Luong et al., 2015](https://arxiv.org/abs/1508.04025)
+- RNN-2 [(Luong et al., 2015)](https://arxiv.org/abs/1508.04025)
 ```
 python cli.py evaluate --model_name 'rnn' --dataset [*] --attention 'luong'
 ```
-- Convolutional [Gehring et al., 2017](https://arxiv.org/abs/1705.03122)
+- Convolutional [(Gehring et al., 2017)](https://arxiv.org/abs/1705.03122)
 ```
 python cli.py evaluate --model_name 'cnn' --dataset [*]
 ```
-- Transformer [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)
+- Transformer [(Vaswani et al., 2017)](https://arxiv.org/abs/1706.03762)
 ```
 python cli.py evaluate --model_name 'transformer' --dataset [*]
 ```
