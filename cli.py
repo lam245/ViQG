@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from torchtext.data import BucketIterator
 from underthesea import word_tokenize
-from main import set_SEED, parse_args
+from main import set_SEED
 from parser_data.load_data import load_json
 from parser_data.prepare_data import HandleDataset
 from seq2seq.metrics import ComputeScorer
@@ -67,7 +67,7 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     elif model_name == 'transformer':
         from seq2seq.models.transformer import Encoder, Decoder, NoamOpt
 
-    DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    DEVICE = torch.device('cuda')
 
     if model_name == 'rnn' and attention == 'luong':
         encoder = Encoder(src_vocab, DEVICE, cell_name)
