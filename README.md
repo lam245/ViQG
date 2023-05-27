@@ -32,6 +32,34 @@ To install dependencies, run:
 pip install -r requirements.txt
 ```
 ### CLI
+To proceed with model training, please run the following code snippets:
+- RNN-1 [(Bahdanau et al., 2016)](https://arxiv.org/abs/1409.0473)
+```
+python cli.py evaluate --model_name 'rnn' --dataset [*] --attention 'bahdanau'
+```
+- RNN-2 [Luong et al., 2015](https://arxiv.org/abs/1508.04025)
+```
+python cli.py evaluate --model_name 'rnn' --dataset [*] --attention 'luong'
+```
+- Convolutional [Gehring et al., 2017](https://arxiv.org/abs/1705.03122)
+```
+python cli.py evaluate --model_name 'cnn' --dataset [*]
+```
+- Transformer [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)
+```
+python cli.py evaluate --model_name 'transformer' --dataset [*]
+```
+- ViT5 and BARTpho
+```
+Comming soon!
+```
+***Note**
+
+[*]: name of dataset
+If you want to customize the batch size and number of epochs, you can do the following:
+```
+python cli.py evaluate --model_name 'rnn' --dataset [*] --attention 'bahdanau' --batch_size 16 --epochs_num 10
+```
 
 ## Citation
 
