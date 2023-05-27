@@ -169,5 +169,5 @@ df_result = pd.DataFrame(data=r)
 df_result.to_csv('statistic.csv')
 
 html = df_result.style.set_table_styles([{'selector': 'th', 'props': [('font-size', '15pt')]}]).set_properties(**{'font-size': '15pt'})
-
+print(html)
 print(html.__dict__)
