@@ -42,7 +42,7 @@ class Trainer(object):
     def _train_batch(self, model, iterator, teacher_ratio, clip):
         model.train()
         epoch_loss = 0
-        # scaler = GradScaler()
+        #scaler = GradScaler()
         for _, batch in enumerate(tqdm.tqdm(iterator)):
             src, src_len = batch.src
             trg = batch.trg
@@ -60,8 +60,6 @@ class Trainer(object):
             torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
             self.optimizer.step()
             epoch_loss += loss.item()
-
-        return epoch_loss / len(iterator)
 
     def _get_iterators(self, train_data, valid_data, model_name):
         return BucketIterator.splits((train_data, valid_data),

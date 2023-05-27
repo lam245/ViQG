@@ -67,8 +67,8 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     elif model_name == 'transformer':
         from seq2seq.models.transformer import Encoder, Decoder, NoamOpt
 
-    DEVICE = torch.device('cuda')
-
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(DEVICE)
     if model_name == 'rnn' and attention == 'luong':
         encoder = Encoder(src_vocab, DEVICE, cell_name)
         decoder = Decoder(trg_vocab, DEVICE, cell_name)
