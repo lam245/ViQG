@@ -162,6 +162,10 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     df_result = pd.DataFrame(data=r)
     df_result.to_csv('results.csv')
     print(df_result)
+    html = df_result.style.set_table_styles([{'selector': 'th', 'props': [('font-size', '15pt')]}]).set_properties(
+        **{'font-size': '15pt'})
+    print(html.__dict__)
+    html
 
 if __name__ == '__main__':
     cli()
