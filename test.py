@@ -20,9 +20,9 @@ nltk.download('wordnet')
 
 set_SEED()
 
-train = load_json('datasets/ViNewsQA/train_ViNewsQA.json')
-val = load_json('datasets/ViNewsQA/dev_ViNewsQA.json')
-test = load_json('datasets/ViNewsQA/test_ViNewsQA.json')
+train = load_json('datasets/ViNewsQA/train_ViNewsQA.json', 'ViNewsQA')
+val = load_json('datasets/ViNewsQA/dev_ViNewsQA.json', 'ViNewsQA')
+test = load_json('datasets/ViNewsQA/test_ViNewsQA.json','ViNewsQA')
 
 dataset = HandleDataset(train, val, test)
 dataset.load_data_and_fields()
@@ -50,7 +50,7 @@ TRANSFORMER_NAME = 'transformer'
 ATTENTION_1 = 'bahdanau'
 ATTENTION_2 = 'luong'
 # Choose model here
-args.model = TRANSFORMER_NAME # CNN and Transformers don't apply Attention_1, Attention_2
+args.model = CNN_NAME # CNN and Transformers don't apply Attention_1, Attention_2
 args.attention = ATTENTION_2
 cell_name = 'gru'
 
