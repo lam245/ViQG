@@ -54,7 +54,7 @@ class Encoder(nn.Module):
         x = self.embed_tokens(src_tokens)
         x = F.dropout(x, p=self.dropout, training=self.training) # (src_len, batch, embed_dim)
 
-        packed_x = nn.utils.rnn.pack_padded_sequence(x, src_lengths)
+        packed_x = nn.utils.rnn.pack_padded_sequence(x, src_lengths.cpu())
 
         packed_outputs, hidden = self.rnn(packed_x) # hidden: (n_layers * num_directions, batch, hidden_size)
 

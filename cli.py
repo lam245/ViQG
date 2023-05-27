@@ -68,7 +68,7 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
         from seq2seq.models.transformer import Encoder, Decoder, NoamOpt
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(DEVICE)
+
     if model_name == 'rnn' and attention == 'luong':
         encoder = Encoder(src_vocab, DEVICE, cell_name)
         decoder = Decoder(trg_vocab, DEVICE, cell_name)
@@ -138,7 +138,6 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     # calculate blue score for valid and test data
     predictor = Predictor(model, src_vocab, trg_vocab, DEVICE)
 
-    # # train_scorer = BleuScorer()
     valid_scorer = ComputeScorer()
     test_scorer = ComputeScorer()
 
