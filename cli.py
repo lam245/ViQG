@@ -15,6 +15,7 @@ from seq2seq.trainer import Trainer
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from IPython.display import display
 import nltk
 nltk.download('wordnet')
 
@@ -160,11 +161,8 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
 
     df_result = pd.DataFrame(data=r)
     df_result.to_csv('results.csv')
-    print(df_result)
-    html = df_result.style.set_table_styles([{'selector': 'th', 'props': [('font-size', '15pt')]}]).set_properties(
-        **{'font-size': '15pt'})
-    print(html.__dict__)
-    html
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        display(df_result)
 
 if __name__ == '__main__':
     cli()

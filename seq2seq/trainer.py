@@ -1,8 +1,8 @@
+import time
+import tqdm
 import numpy as np
 import torch
-import tqdm
-from main import Checkpoint
-import time
+from torch.cuda.amp import autocast, GradScaler
 from torchtext.data import BucketIterator
 
 class Evaluator(object):
@@ -27,8 +27,6 @@ class Evaluator(object):
                 loss = self.criterion(output, trg)
                 epoch_loss += loss.item()
         return epoch_loss / len(iterator)
-
-
 class Trainer(object):
     """Trainer Class"""
 
@@ -42,7 +40,7 @@ class Trainer(object):
     def _train_batch(self, model, iterator, teacher_ratio, clip):
         model.train()
         epoch_loss = 0
-        #scaler = GradScaler()
+        # scaler = GradScaler()
         for _, batch in enumerate(tqdm.tqdm(iterator)):
             src, src_len = batch.src
             trg = batch.trg
@@ -60,6 +58,8 @@ class Trainer(object):
             torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
             self.optimizer.step()
             epoch_loss += loss.item()
+
+        return epoch_loss / len(iterator)
 
     def _get_iterators(self, train_data, valid_data, model_name):
         return BucketIterator.splits((train_data, valid_data),
@@ -99,7 +99,6 @@ class Trainer(object):
             self._log_epoch(train_loss, valid_loss, epoch, start_time, end_time)
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                Checkpoint.save(model, 'gru', path_)
         return train_loss_list, val_loss_list
 
     def train(self, model, train_data, valid_data, path_, num_of_epochs=20, teacher_ratio=1.0, clip=1):
