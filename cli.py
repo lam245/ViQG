@@ -31,7 +31,7 @@ def cli():
                 default=None, help="the dataset used for training model")
 @click.option('--attention', default='luong', type=click.Choice(('bahdanau','luong')), help='attention layer for rnn model')
 @click.option('--batch_size', default=8, type=int, help='batch size')
-@click.option('--epochs_num', default=30, type=int, help='number of epochs')
+@click.option('--epochs_num', default=20, type=int, help='number of epochs')
 @click.option('--cell_name', type=click.Choice(('lstm','gru')), default='gru')
 def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name):
     """
@@ -94,7 +94,7 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
         for p in model.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
-        optimizer = NoamOpt(torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9))
+        optimizer = NoamOpt(torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.98), eps=1e-9))
     else:
         optimizer = optim.Adam(model.parameters(), lr=0.001)
 
