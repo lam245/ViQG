@@ -27,6 +27,8 @@ class Evaluator(object):
                 loss = self.criterion(output, trg)
                 epoch_loss += loss.item()
         return epoch_loss / len(iterator)
+
+
 class Trainer(object):
     """Trainer Class"""
 

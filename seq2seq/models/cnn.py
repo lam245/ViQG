@@ -271,4 +271,4 @@ class Decoder(nn.Module):
 
         outputs = self.linear_out(conved)
 
-        return outputs
+        return outputs # , avg_attn_scores

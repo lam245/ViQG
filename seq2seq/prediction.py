@@ -1,5 +1,7 @@
 import torch
 from seq2seq.models.conf import SOS_TOKEN, EOS_TOKEN
+
+
 class Predictor(object):
     """Predictor class"""
 

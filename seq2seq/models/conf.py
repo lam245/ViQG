@@ -1,3 +1,3 @@
-EOS_TOKEN = '</s>'
-SOS_TOKEN = '<s>'
+EOS_TOKEN = '<eos>'
+SOS_TOKEN = '<sos>'
 PAD_TOKEN = '<pad>'

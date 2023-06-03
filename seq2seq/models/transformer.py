@@ -10,10 +10,8 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from seq2seq.models.conf import PAD_TOKEN
 
-
 class Encoder(nn.Module):
     """Encoder"""
-
     def __init__(self, vocabulary, device, embed_dim=512, layers=2,
                  heads=8, pf_dim=2048, dropout=0.5, max_positions=5000):
         super().__init__()
@@ -47,10 +45,8 @@ class Encoder(nn.Module):
 
         return x
 
-
 class EncoderLayer(nn.Module):
     """EncoderLayer"""
-
     def __init__(self, embed_dim, heads, pf_dim, dropout, device):
         super().__init__()
 
@@ -73,10 +69,8 @@ class EncoderLayer(nn.Module):
 
         return x
 
-
 class Decoder(nn.Module):
     """Decoder"""
-
     def __init__(self, vocabulary, device, embed_dim=512, layers=2,
                  heads=8, pf_dim=2048, dropout=0.5, max_positions=5000):
         super().__init__()
@@ -117,10 +111,10 @@ class Decoder(nn.Module):
         src_tokens = kwargs.get('src_tokens', '')
         src_mask, trg_mask = self.make_masks(src_tokens, trg_tokens)
 
-        # print(trg_tokens.shape) #batch_size = 12
-        x = self.embed_tokens(trg_tokens) * self.scale  # [12, 296, 512]
+        #print(trg_tokens.shape) #batch_size = 12
+        x = self.embed_tokens(trg_tokens) * self.scale #[12, 296, 512]
 
-        x += self.embed_positions(trg_tokens)  # [1, 100, 512]
+        x += self.embed_positions(trg_tokens)#[1, 100, 512]
         x = F.dropout(x, p=self.dropout, training=self.training)
 
         for layer in self.layers:
@@ -128,10 +122,8 @@ class Decoder(nn.Module):
 
         return self.linear_out(x)
 
-
 class DecoderLayer(nn.Module):
     """DecoderLayer"""
-
     def __init__(self, embed_dim, heads, pf_dim, dropout, device):
         super().__init__()
         self.layer_norm = nn.LayerNorm(embed_dim)
@@ -157,10 +149,8 @@ class DecoderLayer(nn.Module):
 
         return x
 
-
 class MultiHeadedAttention(nn.Module):
     """MultiHeadedAttention"""
-
     def __init__(self, embed_dim, heads, dropout, device):
         super().__init__()
         assert embed_dim % heads == 0
@@ -193,29 +183,27 @@ class MultiHeadedAttention(nn.Module):
         K = self.linear_k(key)
         V = self.linear_v(value)
 
-        Q = Q.view(batch_size, -1, self.heads, self.attn_dim).permute(0, 2, 1, 3)  # (batch, heads, sent_len, attn_dim)
-        K = K.view(batch_size, -1, self.heads, self.attn_dim).permute(0, 2, 1, 3)  # (batch, heads, sent_len, attn_dim)
-        V = V.view(batch_size, -1, self.heads, self.attn_dim).permute(0, 2, 1, 3)  # (batch, heads, sent_len, attn_dim)
+        Q = Q.view(batch_size, -1, self.heads, self.attn_dim).permute(0, 2, 1, 3) # (batch, heads, sent_len, attn_dim)
+        K = K.view(batch_size, -1, self.heads, self.attn_dim).permute(0, 2, 1, 3) # (batch, heads, sent_len, attn_dim)
+        V = V.view(batch_size, -1, self.heads, self.attn_dim).permute(0, 2, 1, 3) # (batch, heads, sent_len, attn_dim)
 
-        energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale  # (batch, heads, sent_len, sent_len)
+        energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale # (batch, heads, sent_len, sent_len)
 
         if mask is not None:
             energy = energy.masked_fill(mask == 0, -1e10)
 
-        attention = F.softmax(energy, dim=-1)  # (batch, heads, sent_len, sent_len)
+        attention = F.softmax(energy, dim=-1) # (batch, heads, sent_len, sent_len)
         attention = F.dropout(attention, p=self.dropout, training=self.training)
 
-        x = torch.matmul(attention, V)  # (batch, heads, sent_len, attn_dim)
-        x = x.permute(0, 2, 1, 3).contiguous()  # (batch, sent_len, heads, attn_dim)
-        x = x.view(batch_size, -1, self.heads * (self.attn_dim))  # (batch, sent_len, embed_dim)
+        x = torch.matmul(attention, V) # (batch, heads, sent_len, attn_dim)
+        x = x.permute(0, 2, 1, 3).contiguous() # (batch, sent_len, heads, attn_dim)
+        x = x.view(batch_size, -1, self.heads * (self.attn_dim)) # (batch, sent_len, embed_dim)
         x = self.linear_out(x)
 
         return x
 
-
 class PositionwiseFeedforward(nn.Module):
     """PositionwiseFeedforward"""
-
     def __init__(self, embed_dim, pf_dim, dropout):
         super().__init__()
         self.linear_1 = nn.Linear(embed_dim, pf_dim)
@@ -235,10 +223,8 @@ class PositionwiseFeedforward(nn.Module):
 
         return self.linear_2(x)
 
-
 class PositionalEmbedding(nn.Module):
     "Implement the PE function."
-
     def __init__(self, d_model, dropout, max_len=500):
         super().__init__()
         pos_embed = torch.zeros(max_len, d_model)
@@ -250,12 +236,11 @@ class PositionalEmbedding(nn.Module):
         self.register_buffer('pos_embed', pos_embed)
 
     def forward(self, x):
-        return Variable(self.pos_embed[:, :x.size(1)], requires_grad=False)
 
+        return Variable(self.pos_embed[:, :x.size(1)], requires_grad=False)
 
 class NoamOpt:
     "Optim wrapper that implements rate."
-
     def __init__(self, optimizer, model_size=512, factor=1, warmup=2000):
         self.optimizer = optimizer
         self._step = 0
@@ -274,13 +259,13 @@ class NoamOpt:
         self._rate = rate
         self.optimizer.step()
 
-    def rate(self, step=None):
+    def rate(self, step = None):
         "Implement `lrate` above"
         if step is None:
             step = self._step
         return self.factor * \
             (self.model_size ** (-0.5) *
-             min(step ** (-0.5), step * self.warmup ** (-1.5)))
+            min(step ** (-0.5), step * self.warmup ** (-1.5)))
 
     def zero_grad(self):
         self.optimizer.zero_grad()

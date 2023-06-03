@@ -32,7 +32,6 @@ class Seq2Seq(nn.Module):
                 - attention scores of shape `(batch, trg_len, src_len)`
         """
         encoder_out = self.encoder(src_tokens, src_lengths=src_lengths)
-
         decoder_out = self.decoder(trg_tokens, encoder_out,
                                    src_tokens=src_tokens,
                                    teacher_forcing_ratio=teacher_forcing_ratio)
