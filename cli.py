@@ -38,6 +38,7 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     Training and evaluate model for QG task in Vietnamese Text
     """
 
+    global Encoder, Decoder, NoamOpt
     print("data: ", dataset)
     print("model: ", model_name)
     print('--------------------------------')
