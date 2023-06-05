@@ -8,7 +8,6 @@ import torch.nn as nn
 import torch.onnx.operators
 import torch.nn.functional as F
 from torch.autograd import Variable
-from seq2seq.models.conf import PAD_TOKEN
 
 class Encoder(nn.Module):
     """Encoder"""
@@ -16,7 +15,7 @@ class Encoder(nn.Module):
                  heads=8, pf_dim=2048, dropout=0.5, max_positions=5000):
         super().__init__()
         input_dim = len(vocabulary)
-        self.padding_idx = vocabulary.stoi[PAD_TOKEN]
+        self.padding_idx = vocabulary.stoi['<pad>']
         self.dropout = dropout
         self.device = device
 
@@ -76,7 +75,7 @@ class Decoder(nn.Module):
         super().__init__()
 
         output_dim = len(vocabulary)
-        self.pad_id = vocabulary.stoi[PAD_TOKEN]
+        self.pad_id = vocabulary.stoi['<pad>']
         self.pf_dim = pf_dim
         self.dropout = dropout
         self.device = device

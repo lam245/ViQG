@@ -3,15 +3,14 @@ import random
 import numpy as np
 import torch
 def parse_args():
-    """Add arguments to parser_data"""
-    parser = argparse.ArgumentParser(description='Baseline models.')
-    parser.add_argument('--model_name', default='rnn', type=str,
-                        choices=['rnn','cnn','transformer'], help='model to train the dataset')
-    parser.add_argument('--dataset', type = str,
-                        choices=['ViNewsQA','ViQuAD','ViCoQA','ViMMRC1.0','ViMMRC2.0'],
-                        help = 'the dataset used for training model')
+    """Add arguments to parser"""
+    parser = argparse.ArgumentParser(description='Verbalization dataset baseline models.')
+    parser.add_argument('--model', default='rnn', type=str,
+                        choices=['rnn', 'cnn', 'transformer'], help='model to train the dataset')
+    parser.add_argument('--input', default='CA', type=str,
+                        choices=['CA'], help='use question as input')
     parser.add_argument('--attention', default='luong', type=str,
-                        choices=['bahdanau','luong'], help='attention layer for rnn model')
+                        choices=['bahdanau', 'luong'], help='attention layer for rnn model')
     parser.add_argument('--batch_size', default=8, type=int, help='batch size')
     parser.add_argument('--epochs_num', default=30, type=int, help='number of epochs')
     args = parser.parse_args()
