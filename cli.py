@@ -37,8 +37,6 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     """
     Training and evaluate model for QG task in Vietnamese Text
     """
-
-    global Encoder, Decoder, NoamOpt
     print("data: ", dataset)
     print("model: ", model_name)
     print('--------------------------------')
@@ -69,6 +67,7 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     elif model_name == 'transformer':
         from seq2seq.models.transformer import Encoder, Decoder, NoamOpt
 
+    set_SEED()
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if model_name == 'rnn' and attention == 'luong':
@@ -95,9 +94,9 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
         for p in model.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
-        optimizer = NoamOpt(torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9))
+        optimizer = NoamOpt(torch.optim.Adam(model.parameters(), lr=3e-4, betas=(0.9, 0.98), eps=1e-9))
     else:
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=3e-4)
 
 
     criterion = nn.CrossEntropyLoss(ignore_index=trg_vocab.stoi[PAD_TOKEN])
