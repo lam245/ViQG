@@ -49,7 +49,7 @@ class Encoder(nn.Module):
         embedded = self.embedding(src_tokens)
         embedded = F.dropout(embedded, p=self.dropout, training=self.training)
 
-        embedded = nn.utils.rnn.pack_padded_sequence(embedded, src_lengths, batch_first=True)
+        embedded = nn.utils.rnn.pack_padded_sequence(embedded, src_lengths.cpu(), batch_first=True)
         output, hidden = self.rnn(embedded)
 
         output, _ = nn.utils.rnn.pad_packed_sequence(output, batch_first=True)
