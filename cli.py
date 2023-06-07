@@ -98,9 +98,9 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
         for p in model.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
-        optimizer = NoamOpt(torch.optim.Adam(model.parameters(), lr=3e-4, betas=(0.9, 0.98), eps=1e-9))
+        optimizer = NoamOpt(torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9))
     else:
-        optimizer = optim.Adam(model.parameters(), lr=3e-4)
+        optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 
     criterion = nn.CrossEntropyLoss(ignore_index=trg_vocab.stoi[PAD_TOKEN])
