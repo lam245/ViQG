@@ -2,8 +2,9 @@ import click
 import math
 import numpy as np
 import pandas as pd
+from nltk import word_tokenize
 from torchtext.data import BucketIterator
-from underthesea import word_tokenize
+#from underthesea import word_tokenize
 from main import set_SEED
 from parser_data.load_data import load_json
 from parser_data.prepare_data import HandleDataset
@@ -51,6 +52,9 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
     print(f"Training data: {len(train_data.examples)}")
     print(f"Evaluation data: {len(valid_data.examples)}")
     print(f"Testing data: {len(test_data.examples)}")
+    print('--------------------------------')
+    print(f'Question example: {train_data.examples[2].src}\n')
+    print(f'Answer example: {train_data.examples[2].trg}')
     print('--------------------------------')
     print(f"Unique tokens in questions vocabulary: {len(src_vocab)}")
     print(f"Unique tokens in answers vocabulary: {len(trg_vocab)}")
