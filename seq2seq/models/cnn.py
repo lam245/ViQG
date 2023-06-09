@@ -102,7 +102,7 @@ def extend_conv_spec(convolutions):
 class Encoder(nn.Module):
     """Encoder"""
     def __init__(self, vocabulary, device, embed_dim=512, convolutions=((512, 3),) * 3,
-                 dropout=0.5, max_positions=5000):
+                 dropout=0.2, max_positions=5000):
         super().__init__()
         self.vocabulary = vocabulary
         input_dim = len(vocabulary)
