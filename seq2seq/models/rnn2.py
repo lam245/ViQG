@@ -90,7 +90,7 @@ class LearnedPositionalEmbedding(nn.Embedding):
 class Encoder(nn.Module):
     """Encoder"""
     def __init__(self, vocabulary, device, cell_name, hidden_size=512, num_layers=2,
-                 bidirectional=True, dropout=0.2):
+                 bidirectional=True, dropout=0.5):
         super().__init__()
         input_dim = len(vocabulary)
         self.num_layers = num_layers
