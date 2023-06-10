@@ -101,8 +101,8 @@ def extend_conv_spec(convolutions):
 
 class Encoder(nn.Module):
     """Encoder"""
-    def __init__(self, vocabulary, device, embed_dim=512, convolutions=((512, 3),) * 3,
-                 dropout=0.5, max_positions=3000):
+    def __init__(self, vocabulary, device, embed_dim=256, convolutions=((256, 3),) * 3,
+                 dropout=0.5, max_positions=5000):
         super().__init__()
         self.vocabulary = vocabulary
         input_dim = len(vocabulary)
@@ -241,8 +241,8 @@ class Attention(nn.Module):
         return attended_combined, attention
 class Decoder(nn.Module):
     """Decoder"""
-    def __init__(self, vocabulary, device, embed_dim=512, convolutions=((512, 3),) * 3,
-                 dropout=0.5, max_positions=3000):
+    def __init__(self, vocabulary, device, embed_dim=256, convolutions=((256, 3),) * 3,
+                 dropout=0.5, max_positions=5000):
         super().__init__()
 
         self.vocabulary = vocabulary
