@@ -2,9 +2,9 @@ import click
 import math
 import numpy as np
 import pandas as pd
-from nltk import word_tokenize
+#from nltk import word_tokenize
 from torchtext.data import BucketIterator
-#from underthesea import word_tokenize
+from underthesea import word_tokenize
 from main import set_SEED
 from parser_data.load_data import load_json
 from parser_data.prepare_data import HandleDataset

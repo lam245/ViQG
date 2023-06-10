@@ -1,6 +1,6 @@
-from nltk import word_tokenize
+#from nltk import word_tokenize
 from torchtext.data import Example, Dataset, Field
-#from underthesea import word_tokenize
+from underthesea import word_tokenize
 from seq2seq.models.conf import EOS_TOKEN, SOS_TOKEN
 
 class HandleDataset(object):
