@@ -6,6 +6,7 @@ import pandas as pd
 from torchtext.data import BucketIterator
 from underthesea import word_tokenize
 from main import set_SEED
+import wandb
 from parser_data.load_data import load_json
 from parser_data.prepare_data import HandleDataset
 from pre_trained.evaluation import compute_score
@@ -233,6 +234,7 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
         data_collator=data_collator,
         eval_dataset=tokenized_dev
     )
+    wandb.login(key='8faff5796d5c64cba501748b0edd40cd97a5bdfa')
     trainer.train()
 
     if path != "":
