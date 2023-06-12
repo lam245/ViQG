@@ -244,9 +244,9 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
          'BLEU-2': bleu_2 * 100,
          'BLEU-3': bleu_3 * 100,
          'BLEU-4': bleu_4 * 100,
-         'ROUGE-1': rouge[0]['rouge1'],
-         'ROUGE-2': rouge[1]['rouge2'],
-         'ROUGE-L': rouge[2]['rougeL']}
+         'ROUGE-1': rouge[0]['rouge1'] * 100,
+         'ROUGE-2': rouge[1]['rouge2'] * 100,
+         'ROUGE-L': rouge[2]['rougeL'] * 100}
 
     df_result = pd.DataFrame(data=r)
     df_result.to_csv('results_pretrained.csv')
