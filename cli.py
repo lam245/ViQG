@@ -196,9 +196,9 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
     '''train = load_json(f'datasets/{dataset}/train.json', dataset)
     val = load_json(f'datasets/{dataset}/dev.json', dataset)
     test = load_json(f'datasets/{dataset}/test.json', dataset)'''
-    train = load_json(f'/content/drive/MyDrive/Datasets/Data/ViNewsQA/train.json', dataset)
-    val = load_json(f'/content/drive/MyDrive/Datasets/Data/ViNewsQA/dev.json', dataset)
-    test = load_json(f'/content/drive/MyDrive/Datasets/Data/ViNewsQA/test.json', dataset)
+    train = load_json(f'/kaggle/input/vinewsqa-test/train.json', dataset)
+    val = load_json(f'/kaggle/input/vinewsqa-test/dev.json', dataset)
+    test = load_json(f'/kaggle/input/vinewsqa-test/test.json', dataset)
 
     if answer == '1':
         tokenized_train = train.map(function=preprocess_function, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
@@ -250,9 +250,8 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
 
     df_result = pd.DataFrame(data=r)
     df_result.to_csv('results_pretrained.csv')
-    print(df_result)
-    #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        #display(df_result)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        display(df_result)
 
 
 if __name__ == '__main__':
