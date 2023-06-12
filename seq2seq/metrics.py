@@ -41,23 +41,12 @@ class ComputeScorer(object):
         scores = []
         for i in reference:
             scores.append(scorer.score(i,hypothesis)['rougeL'][-1])
-        return np.max(scores) #best
-
-    '''def example_score_rouge_n(self,reference, hypothesis):
-        rouge = Rouge()
-        r = []
-        for i in reference:
-            r.append(rouge.get_scores(hypothesis, i)[0]['rouge-1']['f'])
-        return np.max(r)'''
+        return np.max(scores)
 
     def data_score(self, data, predictor):
         """Score complete list of data"""
         results_prelim = []
         for example in tqdm.tqdm(data):
-            # i = 1
-            #             src = [t.lower() for t in example.src]
-            #             reference = [t.lower() for t in example.trg]
-            #print("example",example)
             src = example[0]
 
             reference = [[string.lower() for string in sublist] for sublist in example[1]]

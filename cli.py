@@ -8,11 +8,15 @@ from underthesea import word_tokenize
 from main import set_SEED
 from parser_data.load_data import load_json
 from parser_data.prepare_data import HandleDataset
+from pre_trained.evaluation import compute_score
+from pre_trained.preprocess import preprocess_function, preprocess_function_without_answer
 from seq2seq.metrics import ComputeScorer
 from seq2seq.models.conf import PAD_TOKEN
 from seq2seq.models.seq2seq import Seq2Seq
 from seq2seq.prediction import Predictor
 from seq2seq.trainer import Trainer
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Seq2SeqTrainingArguments, DataCollatorForSeq2Seq, \
+    Seq2SeqTrainer
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -25,7 +29,7 @@ nltk.download('wordnet')
 def cli():
     pass
 
-@cli.command('evaluate')
+@cli.command('evaluateTNM')
 @click.option('--model_name', type=click.Choice(('rnn','cnn','transformer')), default=None,
               help="Choice model")
 @click.option('--dataset', type=click.Choice(('ViNewsQA','ViQuAD','ViCoQA','ViMMRC1.0','ViMMRC2.0')),
@@ -34,7 +38,7 @@ def cli():
 @click.option('--batch_size', default=8, type=int, help='batch size')
 @click.option('--epochs_num', default=20, type=int, help='number of epochs')
 @click.option('--cell_name', type=click.Choice(('lstm','gru')), default='gru')
-def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name):
+def _evaluateTNM(model_name, dataset, attention, batch_size, epochs_num, cell_name):
     """
     Training and evaluate model for QG task in Vietnamese Text
     """
@@ -164,9 +168,88 @@ def _evaluate(model_name, dataset, attention, batch_size, epochs_num, cell_name)
          'ROUGE-L': [test_scorer.average_rouge_score() * 100]}
 
     df_result = pd.DataFrame(data=r)
-    df_result.to_csv('results.csv')
+    df_result.to_csv('results_traditional.csv')
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         display(df_result)
+
+@cli.command('evaluate')
+@click.option('--model', type=click.Choice(('ViT5','BARTPho')), default=None,
+              help="Choice model")
+@click.option('--dataset', type=click.Choice(('ViNewsQA','ViQuAD','ViCoQA','ViMMRC1.0','ViMMRC2.0')),
+                default=None, help="the dataset used for training model")
+@click.option('--answer', type=click.Choice(('0','1')), default=1, help="include an answer or not? '1' for yes, '0' for no.")
+@click.option('--batch_size', default=4, type=int, help='batch size')
+@click.option('--epochs_num', default=10, type=int, help='number of epochs')
+@click.option('--path', type=str, default=None, help="The path to the location where you want to save the model, ignore if you don't want to save the model.")
+def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
+    print("data: ", dataset)
+    print("model: ", model)
+    print('--------------------------------')
+    if model == 'ViT5':
+        tokenizer = AutoTokenizer.from_pretrained('VietAI/vit5-base')
+        model = AutoModelForSeq2SeqLM.from_pretrained("VietAI/vit5-base")
+    else:
+        tokenizer = AutoTokenizer.from_pretrained('vinai/bartpho-syllable-base')
+        model = AutoModelForSeq2SeqLM.from_pretrained("vinai/bartpho-syllable-base")
+
+    train = load_json(f'datasets/{dataset}/train.json', dataset)
+    val = load_json(f'datasets/{dataset}/dev.json', dataset)
+    test = load_json(f'datasets/{dataset}/test.json', dataset)
+
+    if answer == '1':
+        tokenized_train = train.map(function=preprocess_function, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
+        tokenized_dev = val.map(function=preprocess_function, batched=True, remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer},num_proc=8)
+    else:
+        tokenized_train = train.map(function=preprocess_function_without_answer, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
+        tokenized_dev = val.map(function=preprocess_function_without_answer, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
+
+    data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, return_tensors="pt")
+
+    training_args = Seq2SeqTrainingArguments("tmp/",
+                                             do_train=True,
+                                             do_eval=True,
+                                             num_train_epochs=epochs_num,
+                                             learning_rate=1e-5,
+                                             warmup_ratio=0.05,
+                                             weight_decay=0.01,
+                                             per_device_train_batch_size=batch_size,
+                                             per_device_eval_batch_size=16,
+                                             predict_with_generate=True,
+                                             group_by_length=True,
+                                             save_total_limit=1,
+                                             gradient_accumulation_steps=16,
+                                             eval_steps=50,
+                                             evaluation_strategy="steps",
+                                             )
+    trainer = Seq2SeqTrainer(
+        model=model,
+        tokenizer=tokenizer,
+        args=training_args,
+        train_dataset=tokenized_train,
+        data_collator=data_collator,
+        eval_dataset=tokenized_dev
+    )
+
+    trainer.train()
+
+    if path != "":
+        trainer.save_model(path)
+
+    rouge, bleu_1, bleu_2, bleu_3, bleu_4 = compute_score(answer,test,model,tokenizer)
+
+    r = {'BLEU-1': bleu_1 * 100,
+         'BLEU-2': bleu_2 * 100,
+         'BLEU-3': bleu_3 * 100,
+         'BLEU-4': bleu_4 * 100,
+         'ROUGE-1': rouge[0]['rouge1'],
+         'ROUGE-2': rouge[1]['rouge2'],
+         'ROUGE-L': rouge[2]['rougeL']}
+
+    df_result = pd.DataFrame(data=r)
+    df_result.to_csv('results_pretrained.csv')
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        display(df_result)
+
 
 if __name__ == '__main__':
     cli()
