@@ -6,7 +6,6 @@ from nltk.translate.bleu_score import SmoothingFunction
 import numpy as np
 import nltk
 from nltk import word_tokenize
-import pandas as pd
 from pre_trained.preprocess import preprocess_function, preprocess_function_without_answer
 smoothie = SmoothingFunction().method4
 
@@ -19,7 +18,7 @@ def example_score(reference, hypothesis):
                                                          smoothing_function=SmoothingFunction().method4)
   bleu_4 = nltk.translate.bleu_score.sentence_bleu(reference, hypothesis, weights=(0.25, 0.25, 0.25, 0.25),
                                                          smoothing_function=SmoothingFunction().method4)
-  return bleu_1, bleu_2, bleu_2, bleu_4
+  return bleu_1, bleu_2, bleu_3, bleu_4
 def compute_score(answer,testset,model,tokenizer):
     if answer == "1":
         tokenized_test = testset.map(function=preprocess_function, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
@@ -49,10 +48,6 @@ def compute_score(answer,testset,model,tokenizer):
         predictions.extend(outputs)
         references.extend(actuals)
         metrics.add_batch(predictions=outputs, references=actuals)
-
-    #df = pd.DataFrame({'pred': predictions, 'ref': references})
-
-    #df.to_excel(f'/kaggle/working/pred_ViMMRC2.0_{dataset}.xlsx', index=False)
 
     metrics.compute()
 

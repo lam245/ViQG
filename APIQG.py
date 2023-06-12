@@ -1,5 +1,5 @@
 import torch
-
+from pre_trained.preprocess import preprocess_function
 from datasets import Dataset
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -11,17 +11,6 @@ CORS(app)
 
 tokenizer = AutoTokenizer.from_pretrained('ViT5')
 model = AutoModelForSeq2SeqLM.from_pretrained('ViT5')
-def preprocess_function(examples):
-    pad_on_right = tokenizer.padding_side == "right"
-    model_inputs = tokenizer(
-        examples["answers" if pad_on_right else "contexts"],
-        examples["contexts" if pad_on_right else "answers"],
-        truncation="only_second" if pad_on_right else "only_first",
-        max_length=1024,
-        padding="max_length")
-    model_inputs['input_ids'] = model_inputs['input_ids']
-    return model_inputs
-
 
 @app.route('/q', methods=['POST'])
 def generate_question():
