@@ -250,8 +250,6 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
          'ROUGE-2': rouge[1]['rouge2'] * 100,
          'ROUGE-L': rouge[2]['rougeL'] * 100}
 
-    print(r)
-    #df_result = pd.DataFrame(data=r)
     df_result = pd.DataFrame(data=r, index=[0])
     df_result.to_csv('results_pretrained.csv')
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
