@@ -250,8 +250,9 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
 
     df_result = pd.DataFrame(data=r)
     df_result.to_csv('results_pretrained.csv')
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        display(df_result)
+    print(df_result)
+    #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        #display(df_result)
 
 
 if __name__ == '__main__':
