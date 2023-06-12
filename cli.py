@@ -23,6 +23,7 @@ import torch.optim as optim
 from IPython.display import display
 import nltk
 nltk.download('wordnet')
+nltk.download('punkt')
 
 
 @click.group()
