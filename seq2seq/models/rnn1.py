@@ -6,94 +6,19 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-#from seq2seq.models.conf import PAD_TOKEN, EOS_TOKEN, SOS_TOKEN
-#from seq2seq.models.layers import RNN, Embedding, Linear, LSTM, GRU
+from seq2seq.models.conf import PAD_TOKEN, EOS_TOKEN, SOS_TOKEN
+from seq2seq.models.layers import RNN, Embedding, Linear, LSTM, GRU
 
-EOS_TOKEN = '<eos>'
-SOS_TOKEN = '<sos>'
-PAD_TOKEN = '<pad>'
-def RNN(cell_name):
-    if cell_name.lower() == 'lstm':
-        return LSTM
-    elif cell_name.lower() == 'gru':
-        return GRU
-    else:
-        raise ValueError(f"Unsupported RNN Cell: {cell_name}")
-
-
-def Embedding(num_embeddings, embedding_dim, padding_idx):
-    """Embedding layer"""
-    m = nn.Embedding(num_embeddings, embedding_dim, padding_idx=padding_idx)
-    nn.init.uniform_(m.weight, -0.1, 0.1)
-    nn.init.constant_(m.weight[padding_idx], 0)
-    return m
-
-
-def Linear(in_features, out_features, bias=True):
-    """Linear layer"""
-    m = nn.Linear(in_features, out_features, bias=bias)
-    m.weight.data.uniform_(-0.1, 0.1)
-    if bias:
-        m.bias.data.uniform_(-0.1, 0.1)
-    return m
-
-
-def LSTM(input_size, hidden_size, **kwargs):
-    """LSTM layer"""
-    m = nn.LSTM(input_size, hidden_size, **kwargs)
-    for name, param in m.named_parameters():
-        if 'weight' in name or 'bias' in name:
-            param.data.uniform_(-0.1, 0.1)
-    return m
-
-
-def GRU(input_size, hidden_size, **kwargs):
-    """GRU layer"""
-    m = nn.GRU(input_size, hidden_size, **kwargs)
-    for name, param in m.named_parameters():
-        if 'weight' in name or 'bias' in name:
-            param.data.uniform_(-0.1, 0.1)
-    return m
-
-
-def Conv1d(in_channels, out_channels, kernel_size, padding=0):
-    """Conv1d"""
-    m = nn.Conv1d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, padding=padding)
-    nn.init.normal_(m.weight, 0, 0.1)
-    nn.init.constant_(m.bias, 0)
-    return m
-
-
-def PositionalEmbedding(num_embeddings, embedding_dim, padding_idx):
-    """PositionalEmbedding"""
-    m = LearnedPositionalEmbedding(num_embeddings, embedding_dim, padding_idx)
-    nn.init.normal_(m.weight, 0, 0.1)
-    nn.init.constant_(m.weight[padding_idx], 0)
-    return m
-
-
-class LearnedPositionalEmbedding(nn.Embedding):
-    """LearnedPositionalEmbedding"""
-
-    def __init__(self, num_embeddings, embedding_dim, padding_idx):
-        super().__init__(num_embeddings, embedding_dim, padding_idx)
-
-    def forward(self, input):
-        """Input size [bsz x seqlen]"""
-        # Replace non-padding symbols with their position numbers.
-        # Position numbers begin at padding_idx+1. Padding symbols are ignored.
-        mask = input.ne(self.padding_idx).int()
-        positions = (torch.cumsum(mask, dim=1).type_as(mask) * mask).long() + self.padding_idx
-        return super().forward(positions)
 class Encoder(nn.Module):
     """Encoder"""
+
     def __init__(self, vocabulary, device, embed_dim=512, hidden_size=512,
                  num_layers=2, dropout=0.5, bidirectional=True, cell_name='gru'):
         super().__init__()
         input_dim = len(vocabulary)
         self.vocabulary = vocabulary
         self.pad_id = vocabulary.stoi[PAD_TOKEN]
-        self.embed_dim= embed_dim
+        self.embed_dim = embed_dim
         self.hidden_size = hidden_size
         self.num_layers = num_layers
 
@@ -128,11 +53,11 @@ class Encoder(nn.Module):
         src_tokens = src_tokens.t()
 
         x = self.embed_tokens(src_tokens)
-        x = F.dropout(x, p=self.dropout, training=self.training) # (src_len, batch, embed_dim)
+        x = F.dropout(x, p=self.dropout, training=self.training)  # (src_len, batch, embed_dim)
 
         packed_x = nn.utils.rnn.pack_padded_sequence(x, src_lengths.cpu())
 
-        packed_outputs, hidden = self.rnn(packed_x) # hidden: (n_layers * num_directions, batch, hidden_size)
+        packed_outputs, hidden = self.rnn(packed_x)  # hidden: (n_layers * num_directions, batch, hidden_size)
 
         x, _ = nn.utils.rnn.pad_packed_sequence(packed_outputs)
         x = F.dropout(x, p=self.dropout, training=self.training)
@@ -143,12 +68,14 @@ class Encoder(nn.Module):
         last_forward = hidden[-2, :, :]
         last_backward = hidden[-1, :, :]
         hidden = torch.cat((last_forward, last_backward), dim=1)
-        hidden = torch.tanh(self.linear_out(hidden)) # (batch, enc_hid_dim)
+        hidden = torch.tanh(self.linear_out(hidden))  # (batch, enc_hid_dim)
 
         return x, hidden
 
+
 class Attention(nn.Module):
     """Attention"""
+
     def __init__(self, enc_hid_dim, dec_hid_dim):
         super().__init__()
 
@@ -169,14 +96,14 @@ class Attention(nn.Module):
         batch = encoder_outputs.shape[1]
         src_len = encoder_outputs.shape[0]
 
-        hidden = hidden.unsqueeze(1).repeat(1, src_len, 1) # (batch, src_len, dec_hid_dim)
+        hidden = hidden.unsqueeze(1).repeat(1, src_len, 1)  # (batch, src_len, dec_hid_dim)
 
-        encoder_outputs = encoder_outputs.permute(1, 0, 2) # (batch, src_len, enc_hid_dim * 2)
+        encoder_outputs = encoder_outputs.permute(1, 0, 2)  # (batch, src_len, enc_hid_dim * 2)
 
-        energy = torch.tanh(self.linear(torch.cat((hidden, encoder_outputs), dim=2))) # (batch, src_len, dec_hid_dim)
-        energy = energy.permute(0, 2, 1) # (batch, dec_hid_dim, src_len)
+        energy = torch.tanh(self.linear(torch.cat((hidden, encoder_outputs), dim=2)))  # (batch, src_len, dec_hid_dim)
+        energy = energy.permute(0, 2, 1)  # (batch, dec_hid_dim, src_len)
 
-        v = self.v.repeat(batch, 1).unsqueeze(1) # (batch, 1, dec_hid_dim)
+        v = self.v.repeat(batch, 1).unsqueeze(1)  # (batch, 1, dec_hid_dim)
 
         attention = torch.bmm(v, energy).squeeze(1)
 
@@ -184,8 +111,10 @@ class Attention(nn.Module):
 
         return F.softmax(attention, dim=1)
 
+
 class Decoder(nn.Module):
     """Decoder"""
+
     def __init__(self, vocabulary, device, embed_dim=512, hidden_size=512,
                  num_layers=2, dropout=0.5, max_positions=500, cell_name='gru'):
         super().__init__()
@@ -220,23 +149,23 @@ class Decoder(nn.Module):
         )
 
     def _decoder_step(self, input, hidden, encoder_outputs, mask):
-        input = input.unsqueeze(0) # (1, batch)
+        input = input.unsqueeze(0)  # (1, batch)
 
-        x = self.embed_tokens(input) # (1, batch, emb_dim)
+        x = self.embed_tokens(input)  # (1, batch, emb_dim)
         x = F.dropout(x, p=self.dropout, training=self.training)
 
-        attn = self.attention(hidden, encoder_outputs, mask) # (batch, src_len)
+        attn = self.attention(hidden, encoder_outputs, mask)  # (batch, src_len)
         attn = F.dropout(attn, p=self.dropout, training=self.training)
 
-        attn = attn.unsqueeze(1) # (batch, 1, src_len)
+        attn = attn.unsqueeze(1)  # (batch, 1, src_len)
 
-        encoder_outputs = encoder_outputs.permute(1, 0, 2) # (batch, src_len, 2 * enc_hid_dim)
+        encoder_outputs = encoder_outputs.permute(1, 0, 2)  # (batch, src_len, 2 * enc_hid_dim)
 
-        weighted = torch.bmm(attn, encoder_outputs) # (batch, 1, 2 * enc_hid_dim)
+        weighted = torch.bmm(attn, encoder_outputs)  # (batch, 1, 2 * enc_hid_dim)
 
-        weighted = weighted.permute(1, 0, 2) # (1, batch, 2 * enc_hid_dim)
+        weighted = weighted.permute(1, 0, 2)  # (1, batch, 2 * enc_hid_dim)
 
-        rnn_input = torch.cat((x, weighted), dim=2) # (1, batch, 2 * enc_hid_dim + embed_dim)
+        rnn_input = torch.cat((x, weighted), dim=2)  # (1, batch, 2 * enc_hid_dim + embed_dim)
 
         output, hidden = self.rnn(rnn_input, hidden.unsqueeze(0))
         # output: (1, batch, dec_hid_dim)
@@ -247,7 +176,7 @@ class Decoder(nn.Module):
         weighted = weighted.squeeze(0)
 
         x = torch.cat((output, weighted, x), dim=1)
-        output = self.linear_out(x) # (batch, output_dim)
+        output = self.linear_out(x)  # (batch, output_dim)
 
         return output, hidden.squeeze(0), attn.squeeze(1)
 
@@ -273,9 +202,9 @@ class Decoder(nn.Module):
         if trg_tokens is None:
             teacher_ratio = 0.
             inference = True
-            trg_tokens = torch.zeros((self.max_positions, batch)).long().\
-                                                                  fill_(self.sos_idx).\
-                                                                  to(self.device)
+            trg_tokens = torch.zeros((self.max_positions, batch)).long(). \
+                fill_(self.sos_idx). \
+                to(self.device)
         else:
             trg_tokens = trg_tokens.t()
             inference = False
@@ -289,7 +218,7 @@ class Decoder(nn.Module):
         # prepare decoder input(<sos> token)
         input = trg_tokens[0, :]
 
-        mask = (src_tokens != self.pad_id).permute(1, 0) # (batch, src_len)
+        mask = (src_tokens != self.pad_id).permute(1, 0)  # (batch, src_len)
 
         for i in range(1, max_len):
 
@@ -312,6 +241,6 @@ class Decoder(nn.Module):
             # if inference is enabled and highest predicted token is <eos> then stop
             # and return everything till position i
             if inference and input.item() == self.eos_idx:
-                return outputs[:i] # , attentions[:i]
+                return outputs[:i]  # , attentions[:i]
 
-        return outputs # , attentions
+        return outputs  # , attentions

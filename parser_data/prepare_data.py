@@ -2,6 +2,12 @@ from nltk import word_tokenize
 from torchtext.data import Example, Dataset, Field
 from seq2seq.models.conf import EOS_TOKEN, SOS_TOKEN
 
+class CustomTokenizer:
+    def __call__(self, sentence):
+        tokens = word_tokenize(sentence)
+        tokens = ['<s>'] + tokens + ['</s>']
+        return tokens
+
 class HandleDataset(object):
 
     def __init__(self, train, val, test):
@@ -62,7 +68,7 @@ class HandleDataset(object):
             val_examples.append((src, trg))
 
         # Create fields
-        self.src_field = Field(tokenize=word_tokenize,
+        self.src_field = Field(tokenize=CustomTokenizer(),
                                init_token=SOS_TOKEN,
                                eos_token=EOS_TOKEN,
                                lower=True,

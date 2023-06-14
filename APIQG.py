@@ -12,7 +12,7 @@ CORS(app)
 tokenizer = AutoTokenizer.from_pretrained('ViT5')
 model = AutoModelForSeq2SeqLM.from_pretrained('ViT5')
 
-@app.route('/q', methods=['POST'])
+@app.route('/api', methods=['POST'])
 def generate_question():
 
     data = request.get_json()

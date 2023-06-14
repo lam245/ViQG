@@ -2,7 +2,6 @@ import time
 import tqdm
 import numpy as np
 import torch
-from torch.cuda.amp import autocast, GradScaler
 from torchtext.data import BucketIterator
 
 class Evaluator(object):
