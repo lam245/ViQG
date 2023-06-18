@@ -4,9 +4,12 @@ from datasets import load_metric
 from datasets import DatasetDict, Dataset
 from transformers import Trainer, TrainingArguments, AutoModelForTokenClassification,AutoTokenizer
 
-df = pd.read_json('/kaggle/input/covid19/train_word.json',lines = True)
+'''df = pd.read_json('/kaggle/input/covid19/train_word.json',lines = True)
 df1 = pd.read_json('/kaggle/input/covid19/dev_word.json',lines = True)
-df2 = pd.read_json('/kaggle/input/covid19/test_word.json',lines = True)
+df2 = pd.read_json('/kaggle/input/covid19/test_word.json',lines = True)'''
+df = pd.read_json('/content/drive/MyDrive/Datasets/Covid19/train_word.json',lines = True)
+df1 = pd.read_json('/content/drive/MyDrive/Datasets/Covid19/dev_word.json',lines = True)
+df2 = pd.read_json('/content/drive/MyDrive/Datasets/Covid19/test_word.json',lines = True)
 
 train_src, train_tg = df['words'].to_list(), df['tags'].to_list()
 valid_src, valid_tg = df1['words'].to_list(), df1['tags'].to_list()
