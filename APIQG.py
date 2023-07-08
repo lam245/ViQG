@@ -1,5 +1,4 @@
 import torch
-from pre_trained.preprocess import preprocess_function
 from datasets import Dataset
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -9,8 +8,19 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, DataCollatorForSe
 app = Flask(__name__)
 CORS(app)
 
-tokenizer = AutoTokenizer.from_pretrained('ViT5')
-model = AutoModelForSeq2SeqLM.from_pretrained('ViT5')
+tokenizer = AutoTokenizer.from_pretrained('lehl/ViT5-vinewqg')
+model = AutoModelForSeq2SeqLM.from_pretrained('lehl/ViT5-vinewqg')
+
+def preprocess_function(examples):
+    pad_on_right = tokenizer.padding_side == "right"
+    model_inputs = tokenizer(
+        examples["answers" if pad_on_right else "contexts"],
+        examples["contexts" if pad_on_right else "answers"],
+        truncation="only_second" if pad_on_right else "only_first",
+        max_length=1024,
+        padding="max_length")
+    model_inputs['input_ids'] = model_inputs['input_ids']
+    return model_inputs
 
 @app.route('/api', methods=['POST'])
 def generate_question():
@@ -42,4 +52,4 @@ def generate_question():
     return jsonify({'prediction': question})
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5005)
+    app.run(port=7777)
