@@ -177,11 +177,12 @@ def _evaluateTNM(model_name, dataset, attention, batch_size, epochs_num, cell_na
               help="Choice model")
 @click.option('--dataset', type=click.Choice(('ViNewsQA','ViQuAD','ViCoQA','ViMMRC1.0','ViMMRC2.0')),
                 default=None, help="the dataset used for training model")
-@click.option('--answer', type=click.Choice(('0','1')), default=1, help="include an answer or not? '1' for yes, '0' for no.")
+@click.option('--answer', type=click.Choice(('y','n')), default='y', help="include an answer or not? 'y' for yes, 'n' for no.")
+@click.option('--lr', default=1e-5, type=float, help='learning rate')
 @click.option('--batch_size', default=4, type=int, help='batch size')
 @click.option('--epochs_num', default=10, type=int, help='number of epochs')
 @click.option('--path', type=str, default=None, help="The path to the location where you want to save the model, ignore if you don't want to save the model.")
-def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
+def _evaluate(model,dataset,answer,lr, batch_size,epochs_num,path):
     print("data: ", dataset)
     print("model: ", model)
     print('--------------------------------')
@@ -196,7 +197,7 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
     val = load_json(f'datasets/{dataset}/dev.json', dataset)
     test = load_json(f'datasets/{dataset}/test.json', dataset)
 
-    if answer == '1':
+    if answer == 'y':
         tokenized_train = train.map(function=preprocess_function, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
         tokenized_dev = val.map(function=preprocess_function, batched=True, remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer},num_proc=8)
     else:
@@ -209,7 +210,7 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
                                              do_train=True,
                                              do_eval=True,
                                              num_train_epochs=epochs_num,
-                                             learning_rate=1e-5,
+                                             learning_rate=lr,
                                              warmup_ratio=0.05,
                                              weight_decay=0.01,
                                              per_device_train_batch_size=batch_size,
@@ -246,7 +247,7 @@ def _evaluate(model,dataset,answer,batch_size,epochs_num,path):
          'ROUGE-L': rouge[2]['rougeL'] * 100}
 
     df_result = pd.DataFrame(data=r, index=[0])
-    df_result.to_csv('results_pretrained.csv')
+    #df_result.to_csv('results_pretrained.csv')
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         display(df_result)
 
