@@ -37,7 +37,7 @@ To proceed with model training, please run the following code snippets:
 ```
 python cli.py _evaluate --model_name 'ViT5' --dataset 'ViNewsQA' --answer 'y'
 ```
-***Note**
+**Note**
 
 --dataset: name of dataset
 
