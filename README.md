@@ -20,6 +20,8 @@ Please note that you should prepare a folder to store the data as shown below:
 The available datasets for this source code include: [ViNewsQA](https://arxiv.org/abs/2006.11138), [ViQuAD](https://arxiv.org/abs/2009.14725), 
 [ViCoQA](https://arxiv.org/abs/2105.01542), [ViMMRC1.0](https://arxiv.org/abs/2008.08810), and [ViMMRC2.0](https://arxiv.org/abs/2303.18162).
 
+*If you want to train a model on your own dataset, convert that dataset to a format similar to one of the five datasets provided.
+
 ## Usage
 ### Install
 ```
