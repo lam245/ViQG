@@ -45,7 +45,6 @@ python cli.py _evaluate --model_name 'ViT5' --dataset 'ViNewsQA' --answer 'y'
 
 --answer: include an answer or not? 'y' for yes, 'n' for no. default='y'.
 
-If you want to customize the batch size and number of epochs, you can do the following:
 ```
 python cli.py _evaluate --model_name 'ViT5' --dataset 'ViNewsQA' --lr 1e-5 --batch_size 16 --epochs_num 10
 ```
