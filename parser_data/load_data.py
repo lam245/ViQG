@@ -3,31 +3,24 @@ import tqdm
 import pandas as pd
 
 from datasets import Dataset
-def load_json(data_path: str, dataset: str):
+def load_json(data_path: str):
+    with open(data_path) as f:
+        data_list = json.load(f)
+
     questions = []
-    contexts, answers = [], []
+    answers = []
 
-    if dataset in ['ViNewsQA', 'ViQuAD', 'ViMMRC1.0', 'ViMMRC2.0']:
-        df = pd.read_parquet(data_path)
+    for data in tqdm(data_list):
+        instruction = data.get("instruction", "")
+        if "output" in data:
+            output_text = data["output"]
+            qa_pairs = [pair.split(': ') for pair in output_text.split(' [SEP] ')]
+            for qa_pair in qa_pairs:
+                if len(qa_pair) == 2:
+                    question, answer = qa_pair
+                    questions.append(question)
+                    answers.append(answer)
 
-        for i in range(len(df)):
-            if dataset in ['ViNewsQA', 'ViQuAD']:
-                question = df.loc[i, 'question']
-                context = df.loc[i, 'context']
-                answer = df.loc[i, 'answers']
-            elif dataset in ['ViMMRC1.0', 'ViMMRC2.0']:
-                question = df.loc[i, 'question']
-                context = df.loc[i, 'article']
-                answer = df.loc[i, 'answers']
-            else:
-                question = df.loc[i, 'input_text']
-                context = df.loc[i, 'story']
-                answer = df.loc[i, 'input_text']  # Assuming the answer is in the same column
-
-            questions.append(question)
-            contexts.append(context)
-            answers.append(answer)
-
-    dict_obj = {'contexts': contexts, 'answers': answers, 'questions': questions}
-    datasets = Dataset.from_dict(dict_obj)  # Assuming you have a Dataset class or function
+    dict_obj = {'questions': questions, 'answers': answers}
+    datasets = Dataset.from_dict(dict_obj)
     return datasets
