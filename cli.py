@@ -193,10 +193,10 @@ def _evaluate(model,dataset,answer,lr, batch_size,epochs_num,path):
         tokenizer = AutoTokenizer.from_pretrained('vinai/bartpho-syllable-base')
         model = AutoModelForSeq2SeqLM.from_pretrained("vinai/bartpho-syllable-base")
 
-    train = load_json('/kaggle/input/vinewsdata/vi-news/vinewsqa_train.json')
-    val = load_json('/kaggle/input/vinewsdata/vi-news/vinewsqa_validation.json')
-    test = load_json('/kaggle/input/vinewsdata/vi-news/vinewsqa_test.json')
-
+    train = load_json('/kaggle/input/true-vinew/vi-news/vinewsqa_train.json')
+    val = load_json('/kaggle/input/true-vinew/vi-news/vinewsqa_validation.json')
+    test = load_json('/kaggle/input/true-vinew/vi-news/vinewsqa_test.json')
+                                
     if answer == 'y':
         tokenized_train = train.map(function=preprocess_function, batched=True,remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer}, num_proc=8)
         tokenized_dev = val.map(function=preprocess_function, batched=True, remove_columns=['contexts', 'answers', 'questions'],fn_kwargs={"tokenizer": tokenizer},num_proc=8)
