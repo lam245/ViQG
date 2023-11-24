@@ -11,9 +11,8 @@ def load_json(data_path: str):
     questions = []
     answers = []
 
-    for data in tqdm(data_list):
+    for data in tqdm(data_list):  # Use tqdm as a function, not a module
         context = data.get("input", "")
-        print(context)
         instruction = data.get("instruction", "")
         if "output" in data:
             output_text = data["output"]
