@@ -13,6 +13,7 @@ def load_json(data_path: str):
 
     for data in tqdm(data_list):
         context = data.get("input", "")
+        print(context)
         instruction = data.get("instruction", "")
         if "output" in data:
             output_text = data["output"]
